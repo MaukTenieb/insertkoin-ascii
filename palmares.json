@@ -1,0 +1,13 @@
+{
+ "updated": "2026-11-16T23:55Z",
+ "relays": {
+  "wss://relay.damus.io": 0,
+  "wss://nos.lol": 49,
+  "wss://relay.primal.net": 55,
+  "wss://nostr.mom": 52
+ },
+ "korong": [],
+ "fauninvaders": [],
+ "first": {},
+ "kave": []
+}

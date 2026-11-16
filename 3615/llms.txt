@@ -1,0 +1,31 @@
+# MiniTale (3615)
+
+> Le MiniTale de la Korhogo Fauna, alias Hordalék ou les Masques, l'univers de Mauk Tenieb. Composez le 3615 : l'accueil de 3615 KORHOGO propose six entrées : WORLD, KORHOGO, KOINS, KURATIONS, CURATORS, HALL OF KAVE. / The MiniTale of the Korhogo Fauna, aka Hordalék or the Masks, the universe of Mauk Tenieb. Dial 3615: the 3615 KORHOGO home page offers six entries: WORLD, KORHOGO, KOINS, KURATIONS, CURATORS, HALL OF KAVE.
+
+## Services
+- 3615 KORHOGO : l'accueil, six entrées, et les cinq premiers du Hall of Kave. / the home page, six entries, and the top five of the Hall of Kave.
+- 3615 WORLD : METEO, ENCYCLO (Wikipédia), SNCF, MINITEL (go.minipavi.fr). / WEATHER, ENCYCLO (Wikipedia), SNCF, MINITEL (go.minipavi.fr).
+- Entrée KORHOGO : FAUNA (les 18 fiches de la Fauna), KAVES (tchat en direct), KALABASS (boîte chiffrée, écrire, annuaire, profil), MAUKIE (un mot par e-mail). KAVES et KALABASS demandent un pseudo. / KORHOGO entry: FAUNA (the 18 Fauna profiles), KAVES (live chat), KALABASS (encrypted mailbox, write, directory, profile), MAUKIE (a word by e-mail). KAVES and KALABASS ask for a nickname.
+- 3615 KOINS : le solde, les gains du jour, le barème. / the balance, today's gains, the rules.
+- 3615 KURATIONS : les cassettes Korhogo Kuration des visiteurs d'Insert Koin, lues sur Nostr, 12 par page. / the Korhogo Kuration cassettes of Insert Koin visitors, read on Nostr, 12 per page.
+- 3615 CURATORS : les cassettes tirées des classements des curateurs, 12 par page ; ENVOI ouvre la lecture YouTube d'une cassette. / the tapes drawn from the curators' rankings, 12 per page; ENVOI opens the YouTube playback of a tape.
+- 3615 HALL : le Hall of Kave, les dix meilleurs de Korong! puis de FaunInvaders, une table par page. / the Hall of Kave, the top ten of Korong! then of FaunInvaders, one table per page.
+- Koins : 3 à la première connexion du jour au 3615 KOINS, puis 1 par heure, 10 par jour au plus ; 1 par fiche de la Fauna lue jusqu'au bout ; 1 par message envoyé, 5 par jour ; 1 par victoire dans un jeu ; solde partagé avec Insert Koin. / Koins: 3 at the first connection of the day to 3615 KOINS, then 1 an hour, 10 a day at most; 1 per Fauna profile read to the end; 1 per message sent, 5 a day; 1 per win in a game; balance shared with Insert Koin.
+- Codes : chaque code marche au numéroteur, au kiosque et sur les pages KORHOGO, avec le préfixe 3615 ou seul. / Codes: each code works at the dialler, in the kiosk and on the KORHOGO pages, with the 3615 prefix or alone.
+
+## Links
+- [mauktenieb.github.io, the index of Mauk Tenieb's sites](https://mauktenieb.github.io/)
+- [MiniTale](https://mauktenieb.github.io/insertkoin-ascii/3615/)
+- [Insert Koin](https://mauktenieb.github.io/insertkoin-ascii/)
+- [Mauk Tenieb on GitHub](https://github.com/MaukTenieb)
+
+## Rights
+Copyright © Mauk Tenieb & Korhogo, all rights reserved for everything Korhogo: characters, texts, game rules, portraits, names (Korhogo™, Korhogo Fauna™, Fauna Masks™, Katabatik™, Insert Koin™). The terminal engine is MIT (see LICENSE). Minitel is a trademark of Orange; independent project.
+
+## Mauk Tenieb
+- [Site](https://mauktenieb.github.io/)
+- [Bandcamp](https://mauktenieb.bandcamp.com)
+- [YouTube](https://www.youtube.com/@mauktenieb)
+- [MusicBrainz](https://musicbrainz.org/artist/701a6795-f583-4567-b8f4-0d05f961d63f)
+- [Discogs](https://www.discogs.com/artist/9104440-Mauk-Tenieb)
+- [Wikidata](https://www.wikidata.org/wiki/Q141544315)

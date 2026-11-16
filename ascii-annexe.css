@@ -1,0 +1,23 @@
+/* ascii-annexe.css — Insert Koin ASCII : les pages de texte (bio, notes, Kuration, index de la Kave) passent dans la salle
+   de la borne : fond de salle, texte DM Mono couleur phosphore, titres Press Start 2P ambre, liens cyan. */
+@font-face{font-family:"IK Mono";src:url(font-dm-mono-latin-400-normal.woff2) format("woff2"),url(../font-dm-mono-latin-400-normal.woff2) format("woff2");font-display:swap}
+@font-face{font-family:"IK Arcade";src:url(font-press-start-2p-latin-400-normal.woff2) format("woff2"),url(../font-press-start-2p-latin-400-normal.woff2) format("woff2");font-display:block}
+html{background:#0b0908!important;color-scheme:dark}
+body{background:#0b0908!important;color:#e9dcc0!important;font-family:"IK Mono",ui-monospace,monospace!important;font-size:15px!important;line-height:1.7!important;
+  max-width:72ch!important;margin:0 auto!important;padding:clamp(28px,6vw,72px) clamp(18px,5vw,40px) 96px!important;-webkit-font-smoothing:antialiased}
+body *{font-family:inherit!important;background-color:transparent!important;color:inherit!important;border-color:rgba(255,167,38,.22)!important;box-shadow:none!important;text-shadow:none!important}
+h1,h2,h3,h4{font-family:"IK Arcade",monospace!important;color:#ffa726!important;font-weight:400!important;letter-spacing:.04em!important;line-height:1.45!important;-webkit-font-smoothing:none}
+h1{font-size:clamp(18px,3.2vw,26px)!important;margin:0 0 .9em!important}
+h2{font-size:clamp(13px,2vw,16px)!important;margin:2.2em 0 .8em!important}
+h3,h4{font-size:12px!important;margin:1.8em 0 .6em!important;color:#ffe3a0!important}
+a{color:#4fc3f7!important;text-decoration:underline!important;text-decoration-thickness:1px!important;text-underline-offset:3px!important}
+a:hover{color:#ffe3a0!important}
+a:focus-visible,button:focus-visible{outline:2px solid #4fc3f7!important;outline-offset:3px!important}
+hr{border:0!important;height:1px!important;background:rgba(255,167,38,.25)!important;margin:2.4em 0!important}
+strong,b{color:#ffe3a0!important}
+img{max-width:100%;height:auto}
+table{border-collapse:collapse!important}th,td{padding:.35em .8em .35em 0!important;text-align:left!important}
+input,button,select,textarea{background:#16120f!important;color:#ffe3a0!important;border:1px solid rgba(255,167,38,.35)!important;border-radius:3px!important;padding:.4em .7em!important;font:inherit!important}
+::selection{background:#ffa726;color:#0b0908}
+::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-track{background:#0b0908}::-webkit-scrollbar-thumb{background:#3a2a17;border-radius:5px}
+html{scrollbar-color:#3a2a17 #0b0908}
