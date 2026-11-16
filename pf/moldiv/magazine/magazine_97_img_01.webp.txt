@@ -1,0 +1,37 @@
+r      yd#~      yd#~      y##~     _y##~     _y##~     _y##~     _u##~     _w##~     _w##      _m##      _m##
+     yd#"      y##"     _y##"     _y##"     _y##"     _u##"     _w##"     _m##"     _m##"     _m##"     _m##"
+   yd#"      y##"     _y##"     _J##"     _y##"     _w##"     _w##"     _m##"     _m##"     _m##"     _m##"
+ y##"     _y##"     _y##"     _y##"     _y##"     _w##"     _w##"     _m##"     _m##"     _m##"     _m##"     _m
+##"     _y##"     _J##"     _y##"     _y##"     _w##"     _m##"     _m##"     _m##"     _m##"     _m##"     _m##
+"     _y##"     _y##"     _y##"     _y##"     _a##"     _m##"     _m##"     _m##"     _m##"     _m##"     _m##"
+    _y##"     _y##"     _y##"     _a##"     _m##"     _m##"     _m##"     _m##"     _m##"     _m##"     _m##"
+  _y##"     _y##"     _y##"     _a##"     _m##"     _m##"     _m##"     _m##"     _m##"     _m##"     _m##^
+_y##"     _y##"     _y##"     _a##"     _m##"     _m##"     _m##"     _m##"     _m##"     _m##"     _m#M^     _d
+##"     _y##"     _a##"     _m##"     _m##"     _m##"     _m##"     _m##"     _m##"     _m##"     _d#M^     _d#M
+"     _y##"     _a##"     _m##"     _m##"     _m##"     _m##"     _m##"     _m##"     _d##^     _d#M^     _d#M^
+    _y##"     _a##"     _m##"     _m##"     _m##"     _m##"     _m##"     _m##"     _d##^     _d#M^     _d#M^
+  _w##"     _m##"     _m##"     _m##"     _m##"     _m##"     _m##"     _m##"     _d#M^     _d#M^     _d#M^
+_w##"     _m##"     _m##"     _m##"     _m##"     _m##"     _m##"     _d##^     _d#M^     _d#M^     _d#M^     _d
+##"     _m##"     _m##"     _m##"     _m##"     _m##"     _m##^     _d##^     _d#M^     _d#M^     _d#M^     ,d#M
+"     _m##"     _m##"     _m##"     _m##"     _m##"     _m##^     _d##^     _d#M^     _d#M^     _d#M^     yd#M^
+    _m##"     _m##"     _m##"     _m##"     _m##^     _d##^     _d#M^     _d#M^     _d#M^     _d#M^     yd#M^
+  _m##"     _m##"     _m##"     _m##"     _m##^     _d##^     _d#M^     _d#M^     _d#M^     yd#M^     yd#M^
+_m##"     _m##"     _m##"     _m##"     _d##^     _d##^     _d#M^     _d#M^     _d#M^     yd#M^     yd#M^     yd
+##"     _m##"     _m##"     _m##^     _d##^     _d#M^     _d#M^     _d#M^     yd#M^     yd#M^     yd#M      yd#"
+"     _m##"     _m##"     _d##^     _d##^     _d#M^     _d#M^     _d#M^     yd#M^     yd#M^     yd#"      yd#"
+    _m##"     _d##^     _d##^     _d#W^     _d#M^     _d#M^     yd#M^     yd#M^     yd#M^     yd#"      yd#"
+  _m##"     _d##^     _d##^     _d#W^     _d#M^     _d#M^     yd#M^     yd#M^     yd#M      yd#"      yd#"
+_m##^     _d##^     _d#W^     _d#M^     _d#M^     yd#M^     yd#M^     yd#M^     yd#"      yd#"      yd#"      y#
+##^     _d##^     _d#W^     _d#M^     _d#M^     yd#M^     yd#M^     yd#M      yd#"      yd#"      y##"      y##"
+^     _d#M^     _d#M^     _d#M^     yd#M^     yd#M^     yd#M^     yd#"      yd#"      yd#"      y##"      y##"
+    _d#M^     _d#M^     _d#M^     yd#M^     yd#M^     yd#M^     yd#"      yd#"      yd#"      y##"     _y##"
+  _d#M^     _d#M^     _d#M^     yd#M^     yd#M^     yd#M      yd#"      yd#"      y##"      y##"     _y##"     _
+_d#M^     _d#M^     yd#M^     yd#M^     yd#M^     yd#"      yd#"      yd#"      y##"     _y##"     _y##"     _y#
+#W^     yd#M^     yd#M^     yd#M^     yd#M^     yd#"      yd#"      yd#"     _y##"     _y##"     _y##"     _y##"
+^     yd#M^     yd#M^     yd#M^     yd#"      yd#"      yd#"      y##"     _y##"     _y##"     _y##"     _y##"
+    yd#M^     yd#M^     yd#M^     yd#"      yd#"      yd#"      y##"     _y##"     _y##"     _y##"     _y##"
+  yd#M^     yd#M^     yd#"      yd#"      yd#"      y##"     _y##"     _y##"     _y##"     _y##"     _w##"     _
+yd#M^     yd#M^     yd#"      yd#"      yd#"     _y##"     _y##"     _y##"     _y##"     _y##"     _w##"     _m#
+#M^     yd#M      yd#"      yd#"      yd#"     _y##"     _y##"     _y##"     _y##"     _w##"     _w##"     _m##"
+^     yd#"      yd#"      yd#"      y##"     _y##"     _y##"     _y##"     _y##"     _w##"     _m##"  x~wgw##"
+    \d#"      yd#"      yd#"      y##"      y##"      y##"      y##"      w##"      m##"      m##"      m##"
