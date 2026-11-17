@@ -15,13 +15,13 @@
   var VS = '#version 300 es\nin vec2 p;void main(){gl_Position=vec4(p,0.,1.);}';
   var FS1 = [
     '#version 300 es', 'precision highp float;precision highp int;',
-    'uniform sampler2D src;uniform sampler2D lo;uniform vec2 grid;uniform float pen;uniform int glist[95];uniform int gN;uniform int ramp[18];',
+    'uniform sampler2D src;uniform sampler2D lo;uniform vec2 grid;uniform vec2 org;uniform vec2 csz;uniform float pen;uniform int glist[95];uniform int gN;uniform int ramp[18];',
     'layout(location=0) out vec4 oF;layout(location=1) out vec4 oB;layout(location=2) out vec4 oG;',
     'const int SW=8;const int SH=8;const float K=64.;const float DMIN=0.30;',
     'float L(vec3 c){return dot(c,vec3(.2126,.7152,.0722));}',
     'void main(){',
     ' vec2 cell=floor(gl_FragCoord.xy);vec4 px[64];vec4 sx=vec4(0.);float sq=0.;',
-    ' for(int j=0;j<SH;j++)for(int i=0;i<SW;i++){vec4 c=texture(src,(cell+(vec2(float(i),float(j))+.5)/vec2(float(SW),float(SH)))/grid);px[j*SW+i]=c;sx+=c;sq+=dot(c,c);}',
+    ' for(int j=0;j<SH;j++)for(int i=0;i<SW;i++){vec2 uv=org+(cell+(vec2(float(i),float(j))+.5)/vec2(float(SW),float(SH)))*csz;vec4 c=(uv.x<0.||uv.y<0.||uv.x>1.||uv.y>1.)?vec4(0.):texture(src,uv);px[j*SW+i]=c;sx+=c;sq+=dot(c,c);}',
     ' vec4 mean=sx/K;float var_=(sq-dot(sx,sx)/K)/K;float En=var_*K;',
     ' float bestE=1e9;int bestG=0;vec4 bF=mean;vec4 bB=mean;',
     ' for(int k=0;k<95;k++){if(k>=gN)break;int g=glist[k];',
@@ -49,11 +49,15 @@
     '}'].join('\n');
   var FS2 = [
     '#version 300 es', 'precision highp float;',
-    'uniform sampler2D tF;uniform sampler2D tB;uniform sampler2D tG;uniform sampler2D hi;uniform vec2 grid;uniform vec2 res;out vec4 o;',
-    'void main(){vec2 q=vec2(gl_FragCoord.x,res.y-gl_FragCoord.y)/res*grid;ivec2 c=ivec2(min(floor(q),grid-1.));vec2 f=fract(q);',
-    ' float g=floor(texelFetch(tG,c,0).r*255.+.5);',
+    'uniform sampler2D tF;uniform sampler2D tB;uniform sampler2D tG;uniform sampler2D hi;uniform vec2 grid;uniform vec2 res;uniform vec2 org;uniform vec2 csz;uniform float prog;uniform float time;uniform float scan;out vec4 o;',
+    'float h1(vec2 p){return fract(sin(dot(p,vec2(12.9898,78.233)))*43758.5453);}',
+    'void main(){vec2 uv=vec2(gl_FragCoord.x,res.y-gl_FragCoord.y)/res;vec2 q=(uv-org)/csz;vec2 cc=clamp(floor(q),vec2(0.),grid-1.);ivec2 c=ivec2(cc);vec2 f=fract(q);',
+    ' float g=floor(texelFetch(tG,c,0).r*255.+.5);vec4 F=texelFetch(tF,c,0),B=texelFetch(tB,c,0);',
+    ' float h=h1(cc);float d=clamp((cc.x+cc.y*.6)/(grid.x+grid.y*.6),0.,1.)*.55+h*.45;',   /* vague diagonale, du coin haut gauche */
+    ' if(d>prog){float r=fract(h*977.+floor(time*14.)*.137);g=floor(r*94.)+1.;B=B*.35;if(d>prog+.18){F=vec4(0.);B=vec4(0.);}}',
     ' float m=texture(hi,vec2((g*8.+clamp(f.x*8.,.5,7.5))/760.,clamp(f.y*8.,.5,7.5)/8.)).r;',
-    ' o=mix(texelFetch(tB,c,0),texelFetch(tF,c,0),m);}'].join('\n');
+    ' o=mix(B,F,m);',
+    ' o.rgb*=1.-scan*.09*mod(floor(gl_FragCoord.y),2.);}'].join('\n');
 
   function sh(gl, type, s) { var o = gl.createShader(type); gl.shaderSource(o, s); gl.compileShader(o); if (!gl.getShaderParameter(o, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(o)); return o; }
   function prog(gl, fs) { var p = gl.createProgram(); gl.attachShader(p, sh(gl, gl.VERTEX_SHADER, VS)); gl.attachShader(p, sh(gl, gl.FRAGMENT_SHADER, fs)); gl.bindAttribLocation(p, 0, 'p'); gl.linkProgram(p); if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p)); return p; }
@@ -218,11 +222,16 @@
   }
   function draw(it) {
     var cv = it.cv, S = it.S, gl = S.gl;
-    if (!visible(cv)) { it.ov.style.display = 'none'; return; }
+    if (!visible(cv)) { it.ov.style.display = 'none'; if (it.tx) it.tx.style.display = 'none'; it.hid = true; return; }
     it.ov.style.display = '';
     var g = place(it);
     var cell = cellDev() / Math.min(window.devicePixelRatio || 1, 2);
-    var cols = Math.max(4, Math.round(g.cw / cell)), rows = Math.max(2, Math.round(g.ch / cell));
+    var R0 = it.ov.getBoundingClientRect(), mod = function (a, b) { return ((a % b) + b) % b; };
+    var offX = mod(R0.left + scrollX, cell), offY = mod(R0.top + scrollY, cell);     // une seule trame pour toute la page
+    var cols = Math.max(4, Math.ceil((g.cw + offX) / cell)), rows = Math.max(2, Math.ceil((g.ch + offY) / cell));
+    var orgX = -offX / g.cw, orgY = -offY / g.ch, cszX = cell / g.cw, cszY = cell / g.ch;
+    var now = performance.now(); if (it.hid !== false) { it.t0 = now; it.hid = false; }
+    var prog = Math.min(1.25, (now - it.t0) / (window.ASCII_DECODE_MS || 950));
     gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, S.src);
     gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
     try { gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, cv); }
@@ -240,13 +249,15 @@
     }
     gl.bindFramebuffer(gl.FRAMEBUFFER, S.fb); gl.viewport(0, 0, cols, rows);
     gl.useProgram(S.p1);
-    gl.uniform2f(gl.getUniformLocation(S.p1, 'grid'), cols, rows); gl.uniform1f(gl.getUniformLocation(S.p1, 'pen'), 0.10); gl.uniform1iv(gl.getUniformLocation(S.p1, 'glist'), GL_FULL); gl.uniform1i(gl.getUniformLocation(S.p1, 'gN'), GL_FULL.length);
+    gl.uniform2f(gl.getUniformLocation(S.p1, 'grid'), cols, rows); gl.uniform2f(gl.getUniformLocation(S.p1, 'org'), orgX, orgY); gl.uniform2f(gl.getUniformLocation(S.p1, 'csz'), cszX, cszY); gl.uniform1f(gl.getUniformLocation(S.p1, 'pen'), 0.10); gl.uniform1iv(gl.getUniformLocation(S.p1, 'glist'), GL_FULL); gl.uniform1i(gl.getUniformLocation(S.p1, 'gN'), GL_FULL.length);
     gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, S.lo);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
     gl.bindFramebuffer(gl.FRAMEBUFFER, null); gl.viewport(0, 0, it.ov.width, it.ov.height);
     gl.useProgram(S.p2);
     gl.uniform2f(gl.getUniformLocation(S.p2, 'grid'), cols, rows);
     gl.uniform2f(gl.getUniformLocation(S.p2, 'res'), it.ov.width, it.ov.height);
+    gl.uniform2f(gl.getUniformLocation(S.p2, 'org'), orgX, orgY); gl.uniform2f(gl.getUniformLocation(S.p2, 'csz'), cszX, cszY);
+    gl.uniform1f(gl.getUniformLocation(S.p2, 'prog'), prog); gl.uniform1f(gl.getUniformLocation(S.p2, 'time'), now / 1000); gl.uniform1f(gl.getUniformLocation(S.p2, 'scan'), 1);
     [S.tF, S.tB, S.tG, S.hi].forEach(function (t, i) { gl.activeTexture(gl.TEXTURE0 + i); gl.bindTexture(gl.TEXTURE_2D, t); });
     gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
@@ -290,9 +301,10 @@
     S.gl.bindTexture(S.gl.TEXTURE_2D, S.hi); S.gl.texParameteri(S.gl.TEXTURE_2D, S.gl.TEXTURE_MAG_FILTER, S.gl.NEAREST); S.gl.texParameteri(S.gl.TEXTURE_2D, S.gl.TEXTURE_MIN_FILTER, S.gl.NEAREST);
     baker = { c: c, S: S }; return baker;
   }
-  function bake(img, outW, outH, cell) {
-    var B = getBaker(), S = B.S, gl = S.gl, c = B.c;
-    var cols = Math.max(1, Math.round(outW / cell)), rows = Math.max(1, Math.round(outH / cell));
+  function bake(img, outW, outH, cell, offX, offY) {
+    var B = getBaker(), S = B.S, gl = S.gl, c = B.c; offX = offX || 0; offY = offY || 0;
+    var cols = Math.max(1, Math.ceil((outW + offX) / cell)), rows = Math.max(1, Math.ceil((outH + offY) / cell));
+    var orgX = -offX / outW, orgY = -offY / outH, cszX = cell / outW, cszY = cell / outH;
     c.width = outW; c.height = outH;
     var flt = cell % 8 === 0 ? gl.NEAREST : gl.LINEAR; gl.bindTexture(gl.TEXTURE_2D, S.hi); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, flt); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, flt);
     gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, S.src);
@@ -308,12 +320,14 @@
     S.cols = cols; S.rows = rows;
     gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, S.src);
     gl.viewport(0, 0, cols, rows); gl.useProgram(S.p1);
-    gl.uniform2f(gl.getUniformLocation(S.p1, 'grid'), cols, rows); gl.uniform1f(gl.getUniformLocation(S.p1, 'pen'), 0.15); gl.uniform1iv(gl.getUniformLocation(S.p1, 'glist'), GL_BAKE); gl.uniform1i(gl.getUniformLocation(S.p1, 'gN'), GL_BAKE.length);
+    gl.uniform2f(gl.getUniformLocation(S.p1, 'grid'), cols, rows); gl.uniform2f(gl.getUniformLocation(S.p1, 'org'), orgX, orgY); gl.uniform2f(gl.getUniformLocation(S.p1, 'csz'), cszX, cszY); gl.uniform1f(gl.getUniformLocation(S.p1, 'pen'), 0.15); gl.uniform1iv(gl.getUniformLocation(S.p1, 'glist'), GL_BAKE); gl.uniform1i(gl.getUniformLocation(S.p1, 'gN'), GL_BAKE.length);
     gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, S.lo);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
     gl.bindFramebuffer(gl.FRAMEBUFFER, null); gl.viewport(0, 0, outW, outH); gl.useProgram(S.p2);
     gl.uniform2f(gl.getUniformLocation(S.p2, 'grid'), cols, rows);
     gl.uniform2f(gl.getUniformLocation(S.p2, 'res'), outW, outH);
+    gl.uniform2f(gl.getUniformLocation(S.p2, 'org'), orgX, orgY); gl.uniform2f(gl.getUniformLocation(S.p2, 'csz'), cszX, cszY);
+    gl.uniform1f(gl.getUniformLocation(S.p2, 'prog'), 2); gl.uniform1f(gl.getUniformLocation(S.p2, 'time'), 0); gl.uniform1f(gl.getUniformLocation(S.p2, 'scan'), 0);
     [S.tF, S.tB, S.tG, S.hi].forEach(function (t, i) { gl.activeTexture(gl.TEXTURE0 + i); gl.bindTexture(gl.TEXTURE_2D, t); });
     gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT); gl.drawArrays(gl.TRIANGLES, 0, 3);
     return new Promise(function (ok) { c.toBlob(function (b) { ok(b ? URL.createObjectURL(b) : null); }, 'image/png'); });
@@ -334,7 +348,9 @@
     var p = plan(el.naturalWidth, el.naturalHeight, r.width / el.naturalWidth); if (!p) return;
     var key = o + '|' + p.w, prev = done.get(el); if (prev && prev.key === key) return;
     done.set(el, { key: key });
-    job(function () { return loadImg(o).then(function (im) { return bake(im, p.w, p.h, p.cell); }).then(function (u) {
+    var dprI = window.devicePixelRatio || 1, md = function (a, b) { return ((a % b) + b) % b; };
+    var oxI = md((r.left + scrollX) * dprI, p.cell), oyI = md((r.top + scrollY) * dprI, p.cell);
+    job(function () { return loadImg(o).then(function (im) { return bake(im, p.w, p.h, p.cell, oxI, oyI); }).then(function (u) {
       if (!u) return; var old = done.get(el); if (old && old.url) URL.revokeObjectURL(old.url);
       el.srcset = u + ' ' + p.d.toFixed(5) + 'x'; el.dataset.asciiO = o; done.set(el, { key: key, url: u });
     }); });
@@ -370,8 +386,12 @@
         var m = L.match(/url\("?([^")]+)"?\)/); if (!m) return Promise.resolve(L.trim());
         var o = origUrl(m[1]); if (!o) return Promise.resolve(L.trim());
         return loadImg(o).then(function (im) {
-          var p = plan(im.naturalWidth, im.naturalHeight, layerScale(cs, i, r, im.naturalWidth, im.naturalHeight), false); if (!p) return L.trim();
-          return bake(im, p.w, p.h, p.cell).then(function (u) { return u ? 'image-set(url("' + u + '") ' + p.d.toFixed(5) + 'x)' : L.trim(); });
+          var sc = layerScale(cs, i, r, im.naturalWidth, im.naturalHeight), p = plan(im.naturalWidth, im.naturalHeight, sc, false); if (!p) return L.trim();
+          var w = im.naturalWidth * sc, h = im.naturalHeight * sc, pp = ((cs.backgroundPosition || '0% 0%').split(',')[i] || '0% 0%').trim().split(/\s+/);
+          var pos = function (v, box, img) { return /%$/.test(v) ? (box - img) * parseFloat(v) / 100 : (parseFloat(v) || 0); };
+          var dprB = window.devicePixelRatio || 1, md2 = function (a, b) { return ((a % b) + b) % b; };
+          var ox = md2((r.left + pos(pp[0] || '0%', r.width, w) + scrollX) * dprB, p.cell), oy = md2((r.top + pos(pp[1] || '50%', r.height, h) + scrollY) * dprB, p.cell);
+          return bake(im, p.w, p.h, p.cell, ox, oy).then(function (u) { return u ? 'image-set(url("' + u + '") ' + p.d.toFixed(5) + 'x)' : L.trim(); });
         }, function () { return L.trim(); });
       })).then(function (out) {
         var v = out.join(', ');

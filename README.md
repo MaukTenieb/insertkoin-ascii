@@ -26,6 +26,10 @@ FotoFauna's colour tables and tool masks (`pf/luts`, `pf/moldiv/lut`, `pf/lotogr
 
 ## The clone's own touches
 
+- One grid for the whole page: every cell of every picture, background and game screen falls on the same weft, set on the page itself, as on a terminal of 1985 (`ascii-live.js`).
+- The decoding: each screen that opens (game, room, television, place) composes itself cell by cell, characters cascading in a diagonal wave from the top left corner before they settle on the picture.
+- The tube: fine scan lines on the screens of the world only, the interface stays clean.
+
 - Every text longer than its box scrolls in place, back and forth, as a teleprompter (`ascii-prompteur.js`).
 - The text pages (bio, notes, Kuration, the Kave index) stand in the cabinet's dark room, in DM Mono and Press Start 2P (`ascii-annexe.css`).
 - The loupe: hold Alt, or rest a finger half a second, and a circle follows the hand and shows the original picture under the characters, games included (`ascii-loupe.js`).
