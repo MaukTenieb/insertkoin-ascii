@@ -96,6 +96,50 @@
     var cs = getComputedStyle(el);
     return cs.display !== 'none' && cs.visibility !== 'hidden';
   }
+
+  /* ---- Texte des jeux : chaque fillText/strokeText des canvas est relevé, puis réécrit net dans la grille, en Press Start 2P ---- */
+  var TXT = new WeakMap();
+  (function () {
+    var P = window.CanvasRenderingContext2D && CanvasRenderingContext2D.prototype; if (!P) return;
+    var ft = P.fillText, st = P.strokeText, cr = P.clearRect, fr = P.fillRect;
+    function rec(ctx, t, x, y, stroke) {
+      var c = ctx.canvas; if (!c || !c.isConnected) return;
+      var L = TXT.get(c); if (!L) { L = { items: [] }; TXT.set(c, L); }
+      var m = ctx.getTransform();
+      L.items.push({ t: String(t), x: m.a * x + m.c * y + m.e, y: m.b * x + m.d * y + m.f, sx: Math.hypot(m.a, m.b), sy: Math.hypot(m.c, m.d),
+        font: ctx.font, fill: stroke ? ctx.strokeStyle : ctx.fillStyle, align: ctx.textAlign, base: ctx.textBaseline, alpha: ctx.globalAlpha,
+        w: (function () { try { return ft === null ? 0 : ctx.measureText(String(t)).width * Math.hypot(m.a, m.b); } catch (e) { return 0; } })() });
+      if (L.items.length > 300) L.items.splice(0, L.items.length - 300);
+    }
+    function wipe(ctx, w, h) { var c = ctx.canvas, L = TXT.get(c); if (!L) return; var m = ctx.getTransform(); if (Math.abs(w * m.a) >= c.width * 0.9 && Math.abs(h * m.d) >= c.height * 0.9) L.items = []; }
+    P.fillText = function (t, x, y) { rec(this, t, x, y, false); return ft.apply(this, arguments); };
+    P.strokeText = function (t, x, y) { rec(this, t, x, y, true); return st.apply(this, arguments); };
+    P.clearRect = function (x, y, w, h) { wipe(this, w, h); return cr.apply(this, arguments); };
+    P.fillRect = function (x, y, w, h) { wipe(this, w, h); return fr.apply(this, arguments); };
+  })();
+  try { var ff = new FontFace('IK Arcade', 'url(' + (document.currentScript ? document.currentScript.src.replace(/[^\/]*$/, '') : '') + 'font-press-start-2p-latin-400-normal.woff2)'); ff.load().then(function (f) { document.fonts.add(f); }, function () {}); } catch (e) {}
+  function drawText(it) {
+    var L = TXT.get(it.cv), tx = it.tx; if (!tx) return;
+    tx.style.cssText = it.ov.style.cssText; tx.style.display = it.ov.style.display;
+    if (tx.width !== it.ov.width || tx.height !== it.ov.height) { tx.width = it.ov.width; tx.height = it.ov.height; }
+    var g = tx.getContext('2d'); g.clearRect(0, 0, tx.width, tx.height);
+    if (!L || !L.items.length) return;
+    var k = tx.width / it.cv.width, ky = tx.height / it.cv.height;
+    L.items.forEach(function (o) {
+      if (!o.t.trim()) return;
+      var m = /(\d+(?:\.\d+)?)px/.exec(o.font), h = (m ? parseFloat(m[1]) : 12) * o.sy * ky;
+      var size = Math.max(6, Math.min(h, o.w > 0 ? o.w * k / o.t.length : h));
+      size = Math.max(6, Math.round(size));
+      g.font = size + 'px "IK Arcade", monospace'; g.textAlign = o.align || 'start'; g.textBaseline = o.base || 'alphabetic';
+      var x = o.x * k, y = o.y * ky, w = g.measureText(o.t).width, x0 = x;
+      if (g.textAlign === 'center') x0 = x - w / 2; else if (g.textAlign === 'right' || g.textAlign === 'end') x0 = x - w;
+      var top = y - size; if (g.textBaseline === 'top' || g.textBaseline === 'hanging') top = y; else if (g.textBaseline === 'middle') top = y - size / 2; else if (g.textBaseline === 'bottom') top = y - size;
+      g.globalAlpha = o.alpha == null ? 1 : o.alpha;
+      g.fillStyle = 'rgba(11,9,8,.82)'; g.fillRect(Math.floor(x0 - 2), Math.floor(top - 2), Math.ceil(w + 4), Math.ceil(size + 4));
+      g.fillStyle = typeof o.fill === 'string' ? o.fill : '#ffe3a0'; g.fillText(o.t, x, y);
+    });
+    g.globalAlpha = 1;
+  }
   var layer = null;
   function getLayer() {
     if (layer && layer.isConnected) return layer;
@@ -120,7 +164,9 @@
     var S = null;
     try { S = setupGL(ov); } catch (e) { S = null; console.warn('ascii-live', e && e.message); }
     if (!S) { ov.remove(); cv.dataset.asciiSkip = '1'; return; }
-    var it = { cv: cv, ov: ov, S: S, mode: mode, host: cv.parentElement, prevOpacity: cv.style.opacity };
+    var tx = document.createElement('canvas'); tx.dataset.asciiOverlay = '1'; tx.setAttribute('aria-hidden', 'true'); tx.style.cssText = 'display:none';
+    ov.parentNode.insertBefore(tx, ov.nextSibling);
+    var it = { cv: cv, ov: ov, tx: tx, S: S, mode: mode, host: cv.parentElement, prevOpacity: cv.style.opacity };
     cv.__ascii = it; items.push(it);
   }
   function scan() {
@@ -202,6 +248,7 @@
     gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
     cv.style.opacity = '0';
+    try { if (it.tx.parentNode !== it.ov.parentNode || it.tx.previousSibling !== it.ov) it.ov.parentNode.insertBefore(it.tx, it.ov.nextSibling); drawText(it); } catch (e) {}
   }
   var last = 0;
   function loop(t) {
@@ -210,7 +257,7 @@
     last = t;
     for (var i = items.length - 1; i >= 0; i--) {
       var it = items[i];
-      if (it.dead || !it.cv.isConnected) { it.ov.remove(); it.cv.__ascii = null; items.splice(i, 1); continue; }
+      if (it.dead || !it.cv.isConnected) { it.ov.remove(); if (it.tx) it.tx.remove(); it.cv.__ascii = null; items.splice(i, 1); continue; }
       try { draw(it); } catch (e) { it.dead = true; it.cv.dataset.asciiSkip = '1'; it.cv.style.opacity = it.prevOpacity || ''; }
     }
   }
@@ -220,9 +267,10 @@
   var ROOT = (function () { var s = document.currentScript && document.currentScript.src; return s ? s.slice(0, s.lastIndexOf('/') + 1) : location.href.replace(/[^\/]*$/, ''); })();
   var CELL_CSS = 7, baker = null, queue = Promise.resolve(), done = new WeakMap(), srcCache = new Map();
   function cellDev() { var d = window.devicePixelRatio || 1; return 8 * Math.max(1, Math.round(CELL_CSS * d / 8)); }   // un seul corps, sur pixels entiers
-  function isSmall(el, r) { return Math.min(r.width, r.height) < 8 * CELL_CSS + 8 || !!el.closest('button,[role=button],label,input,select'); }
+  var CONTROL = /(^|\/)(bouton-|baku-boom|camera-|manette-|molette|koin(-hd)?[-.]|de-[a-c]\.|btn|knob|screw|sw-|favicon|icon\.|plaque-|butee-|porte-cle|mikro)/;
+  function isControl(u) { return CONTROL.test((u || '').split(/[?#]/)[0]); }
   function origUrl(u) {
-    if (!u || /^(data|blob):/.test(u)) return null;
+    if (!u || /^(data|blob):|^#|^%23/.test(u)) return null;
     var a = new URL(u, location.href);
     if (a.href.indexOf(ROOT) === 0) { var rel = a.href.slice(ROOT.length).split(/[?#]/)[0]; if (/^_o\//.test(rel) || /(^|\/)(sprite-|busts-|room-puck)/.test(rel)) return null; return ROOT + '_o/' + rel; }
     return a.href;
@@ -278,7 +326,7 @@
     var src = el.currentSrc || el.src, o = origUrl(src);
     if (!o || !el.naturalWidth) return;
     var r = el.getBoundingClientRect(); if (r.width < 12 || r.height < 12) return;
-    if (isSmall(el, r)) { if (!done.get(el)) { done.set(el, { key: 'orig' }); el.srcset = o + ' ' + (el.naturalWidth / el.naturalWidth) + 'x'; } return; }
+    if (isControl(src)) { if (!done.get(el)) { done.set(el, { key: 'orig' }); el.srcset = o + ' ' + (el.naturalWidth / el.naturalWidth) + 'x'; } return; }
     var p = plan(el.naturalWidth, el.naturalHeight, r.width / el.naturalWidth); if (!p) return;
     var key = o + '|' + p.w, prev = done.get(el); if (prev && prev.key === key) return;
     done.set(el, { key: key });
@@ -305,7 +353,7 @@
       if (pv && pv.size && pv.size !== sz) { el.style.backgroundImage = ''; done.delete(el); }
       return;
     }
-    if (isSmall(el, r)) {
+    if (isControl(bg.match(/url\("?([^")]+)"?\)/) ? bg.match(/url\("?([^")]+)"?\)/)[1] : '')) {
       if (!done.get(el)) { done.set(el, { key: 'orig', size: Math.round(r.width) + 'x' + Math.round(r.height) });
         el.style.backgroundImage = bg.replace(/url\("?([^")]+)"?\)/g, function (m0, u) { var o = origUrl(u); return o ? 'url("' + o + '")' : m0; }); }
       return;
@@ -339,7 +387,7 @@
     var cs = getComputedStyle(el, which), bg = cs.backgroundImage;
     if (!bg || bg.indexOf('url(') < 0 || bg.indexOf('blob:') >= 0 || cs.content === 'none') return;
     var w = parseFloat(cs.width), h = parseFloat(cs.height); if (!(w > 12 && h > 12)) return;
-    if (Math.min(w, h) < 8 * CELL_CSS + 8 || el.closest('button,[role=button],label,input,select')) {
+    if (isControl((bg.match(/url\("?([^")]+)"?\)/) || [0, ''])[1])) {
       var mk = donePs.get(el) || {}; if (mk[which + 'orig']) return; mk[which + 'orig'] = 1; donePs.set(el, mk);
       psRule(el, which, bg.replace(/url\("?([^")]+)"?\)/g, function (m0, u) { var o = origUrl(u); return o ? 'url("' + o + '")' : m0; })); return;
     }

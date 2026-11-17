@@ -17,6 +17,10 @@ for(const e of document.querySelectorAll('*')){if(!vis(e))continue;const r=e.get
   out.push([m[1],sx,sy]);}}}
 return out;}"""
 SEL="""n=>{const b=[...document.querySelectorAll('button,a,[role=button]')].find(b=>(b.getAttribute('aria-label')||b.textContent).trim()===n&&b.offsetWidth>0);if(b){b.click();return true}return false}"""
+async def safe_goto(pg,u):
+  for _ in range(3):
+    try: await pg.goto(u,timeout=120000,wait_until='domcontentloaded'); return
+    except Exception as e: print('goto KO',u,str(e)[:60],flush=True)
 async def snap(pg,acc,tag,shots):
   for f in pg.frames:
     try: r=await f.evaluate(JS)
@@ -25,7 +29,12 @@ async def snap(pg,acc,tag,shots):
   for f in pg.frames:
     try: CV.update(await f.evaluate("[...(window.__cv||[])]"))
     except Exception: pass
-  if shots: await pg.screenshot(path=f'/home/claude/t/crawl/{tag}.png')
+  if shots:
+    import os
+    p_=f'/home/claude/t/crawl/{tag}.png'
+    if not os.path.exists(p_):
+      try: await pg.screenshot(path=p_,timeout=120000)
+      except Exception as e: print('capture KO',tag,str(e)[:80],flush=True)
 async def main():
   shots='--shots' in sys.argv
   acc=collections.defaultdict(list);net=set()
@@ -38,21 +47,25 @@ const d=CanvasRenderingContext2D.prototype.drawImage;CanvasRenderingContext2D.pr
 for(const P of [WebGLRenderingContext.prototype,WebGL2RenderingContext.prototype]){const t=P.texImage2D;P.texImage2D=function(...a){rec(a[a.length-1]);return t.apply(this,a)};const s=P.texSubImage2D;P.texSubImage2D=function(...a){rec(a[a.length-1]);return s.apply(this,a)}}
 const cp=window.createImageBitmap;window.createImageBitmap=function(i,...r){rec(i);return cp.call(this,i,...r)};})()""")
       pg=await ctx.new_page();pg.on('request',lambda r:net.add(r.url.split('?')[0]) if r.resource_type=='image' else None)
-      await pg.goto('http://localhost:8765/index.html');await pg.wait_for_timeout(6000)
+      await safe_goto(pg,'http://localhost:8765/index.html');await pg.wait_for_timeout(6000)
       await snap(pg,acc,f'{dev}-home',shots)
       groups={'KorhoGame':['KORONG!','FAUNINVADERS','FAUNARRATIK','FAUNA CHESS','KONNECT4','AKASZTÓFA','MASKERMIND','ERRATIK'],
               'FaunEye':['BAKUBOOK','VHS','KAMORHOGO','MUSIK'],'SurFauna':['REPORHOGO','FAUNATOR'],'3615':[None],'MAUK TENIEB':[None],'LoreLore':[None],'BURROWS':[None]}
       DOT="n=>{const d=[...document.querySelectorAll('.b-dot')].filter(b=>b.getAttribute('aria-label')===n&&b.offsetWidth>0)[0];if(d){d.click();return true}return false}"
       for g,subs in groups.items():
-        await pg.goto('http://localhost:8765/index.html');await pg.wait_for_timeout(4500)
-        await pg.evaluate(SEL,g);await pg.wait_for_timeout(3000)
+        await safe_goto(pg,'http://localhost:8765/index.html');await pg.wait_for_timeout(4500)
+        try: await pg.evaluate(SEL,g)
+        except Exception: pass
+        await pg.wait_for_timeout(3000)
         for s in subs:
-          if s: await pg.evaluate(DOT,s)
+          if s:
+            try: await pg.evaluate(DOT,s)
+            except Exception: pass
           await pg.wait_for_timeout(14000)
           await snap(pg,acc,f'{dev}-{g}-{s or ""}'.replace(' ','_').replace('!',''),shots)
       for page in ['kave/tv.html','kave/wiki.html','kave/videoclub.html','kave/dvd.html','kave/kos.html','fauna-aube.html','kuration.html','reporhogo.html','tor.html','fotofauna.html','skoporhogo.html','borne-bio.html','404.html','notes/index.html','habillages/index.html','fr.html']:
         try:
-          await pg.goto("http://localhost:8765/"+page,timeout=30000);await pg.wait_for_timeout(9000)
+          await safe_goto(pg,"http://localhost:8765/"+page);await pg.wait_for_timeout(9000)
           await snap(pg,acc,f'{dev}-{page.replace("/","_")}',shots)
         except Exception as e: print('KO',page,str(e)[:80])
       await ctx.close()

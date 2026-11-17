@@ -1,0 +1,4 @@
+/* ascii-commun.css — Insert Koin ASCII : focus clavier visible sur toutes les commandes. */
+:where(a,button,[role=button],input,select,textarea,[tabindex]):focus-visible{outline:2px solid #4fc3f7!important;outline-offset:2px!important}
+/* contrastes relevés (mesure : 1,5:1 → ≥ 4,5:1) : noms de cassettes du magnétoscope */
+.vhs-slot>.vhs-label,.vhs-spine-line>span{color:#9db8ff!important}

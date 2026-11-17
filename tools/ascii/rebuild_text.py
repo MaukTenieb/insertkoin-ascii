@@ -44,10 +44,27 @@ for p in glob.glob(f'{O}/**/*.html', recursive=True):
     rel = os.path.relpath(p, O)
     if rel.startswith(('archive/', '_o/')) or rel == '404.html': continue
     s = open(p, encoding='utf-8', errors='surrogateescape').read(); o = s; up = '../' * rel.count('/')
+    if 'ascii-commun.css' not in s:
+        s = re.sub(r'</head>', f'<link rel="stylesheet" href="{up}ascii-commun.css"></head>', s, count=1, flags=re.I)
     if 'ascii-prompteur.js' not in s:
         s = re.sub(r'</head>', f'<script src="{up}ascii-prompteur.js" defer></script></head>', s, count=1, flags=re.I)
     if rel in ANNEXE and 'ascii-annexe.css' not in s:
         s = re.sub(r'</head>', f'<link rel="stylesheet" href="{up}ascii-annexe.css"></head>', s, count=1, flags=re.I)
+    RETOUR = rel in ('skoporhogo.html', 'fotofauna.html', 'kuration.html', 'borne-bio.html', 'reporhogo.html') or rel.startswith(('fauna-', 'notes/'))
+    if RETOUR and 'ascii-retour.js' not in s:
+        s = re.sub(r'</head>', f'<script src="{up}ascii-retour.js" defer></script></head>', s, count=1, flags=re.I)
+    if rel == 'reporhogo.html' and 'ascii-h1' not in s:
+        s = re.sub(r'</head>', '<style id="ascii-h1">h1{text-shadow:none!important}</style></head>', s, count=1, flags=re.I)
+    if rel == '3615/index.html' and 'ascii-ajuste.js' not in s:
+        s = re.sub(r'</head>', '<script src="../ascii-ajuste.js" defer></script></head>', s, count=1, flags=re.I)
     if rel == '3615/index.html' and 'ASCII_NO_CANVAS' not in s: s = s.replace('<script src="../ascii-live.js" defer></script>', '<script>window.ASCII_NO_CANVAS=true</script><script src="../ascii-live.js" defer></script>')
     if s != o: open(p, 'w', encoding='utf-8', errors='surrogateescape').write(s)
 print('couche texte reconstruite')
+
+# commandes : image d'époque dès le premier affichage
+R = re.compile(r'(^|/)(bouton-|baku-boom|camera-|manette-|molette|koin(-hd)?[-.]|de-[a-c]\.|btn|knob|screw|sw-|favicon|icon\.|plaque-|butee-|porte-cle|mikro)')
+for f in glob.glob(SRC + '/**/*', recursive=True):
+    rel = os.path.relpath(f, SRC)
+    if rel.startswith(('pf/', 'archive/')) or not rel.lower().endswith(('.webp', '.png', '.jpg')): continue
+    if R.search(rel): shutil.copy(f, os.path.join(O, rel))
+print("commandes d'époque restaurées")
