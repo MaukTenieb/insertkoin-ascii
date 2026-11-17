@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>INSERT KOIN · exploration textmode</title>
+<style>
+@font-face{font-family:"VT";src:url(../font-vt323-latin-400-normal.woff2) format("woff2");font-display:block}
+:root{--bg:#0b0908;--ink:#ffb000;--dim:#7a5300;--hot:#ffe3a0;--red:#c9302a;--cyan:#4fc3f7;--green:#66bb6a}
+body.vert{--ink:#33ff66;--dim:#14662a;--hot:#c8ffd8;--red:#33ff66;--cyan:#33ff66;--green:#33ff66}
+body.blanc{--ink:#d8d4c8;--dim:#5e5a52;--hot:#ffffff;--red:#ff6a5a;--cyan:#8fd8ff;--green:#9be59f}
+html,body{margin:0;height:100%;background:var(--bg);overflow:hidden}
+body{display:grid;place-items:center;font-family:"VT",monospace;color:var(--ink);cursor:default}
+pre{font-family:"VT",monospace;margin:0;line-height:1;letter-spacing:0;white-space:pre;text-shadow:0 0 .35em color-mix(in srgb,var(--ink) 55%,transparent);user-select:text}
+pre span{white-space:pre}
+.d{color:var(--dim);text-shadow:none}.h{color:var(--hot)}.r{color:var(--red)}.c{color:var(--cyan)}.g{color:var(--green)}
+.k{cursor:pointer}.k:hover{color:var(--hot)}
+pre::after{content:"";position:fixed;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.18) 0 1px,transparent 1px 3px)}
+@media (prefers-reduced-motion:reduce){pre::after{display:none}}
+</style>
+</head>
+<body>
+<pre id="s" aria-label="Insert Koin"></pre>
+<script>
+(function(){
+'use strict';
+var W=96,H=54,E=document.getElementById('s');
+/* ---- grille : caractère + classe de couleur par cellule ---- */
+var ch=[],cl=[];function clr(){for(var i=0;i<W*H;i++){ch[i]=' ';cl[i]='';}}
+function put(x,y,s,c){for(var i=0;i<s.length;i++){var X=x+i;if(X<0||X>=W||y<0||y>=H)continue;if(s[i]!=='\u0000'){ch[y*W+X]=s[i];cl[y*W+X]=c||'';}}}
+function block(x,y,lines,c){lines.forEach(function(l,j){put(x,y+j,l,c);});}
+/* ---- la borne, dessinée trait par trait ---- */
+var MARQ=[
+" ___ _   _ ____  _____ ____ _____   _  _____ ___ _   _ ",
+"|_ _| \\ | / ___|| ____|  _ \\_   _| | |/ / _ \\_ _| \\ | |",
+" | ||  \\| \\___ \\|  _| | |_) || |   | ' / | | | ||  \\| |",
+" | || |\\  |___) | |___|  _ < | |   | . \\ |_| | || |\\  |",
+"|___|_| \\_|____/|_____|_| \\_\\|_|   |_|\\_\\___/___|_| \\_|"];
+function cabinet(){
+  put(6,0,'  .'+'-'.repeat(80)+'.  ','d');
+  put(6,1,' /'+' '.repeat(82)+'\\ ','d');
+  for(var y=2;y<=8;y++){put(6,y,'|','d');put(89,y,'|','d');}
+  put(6,9,'|'+'='.repeat(82)+'|','d');
+  for(y=10;y<=36;y++){put(4,y,'||','d');put(90,y,'||','d');}
+  /* haut-parleurs : trames */
+  for(y=11;y<=35;y+=2){put(7,y,'::::','d');put(85,y,'::::','d');}
+  put(12,10,'.'+'-'.repeat(70)+'.','d');
+  for(y=11;y<=34;y++){put(12,y,'|','d');put(83,y,'|','d');}
+  put(12,35,"'"+'-'.repeat(70)+"'",'d');
+  /* panneau de commande en plongée */
+  put(4,37,'/'+'_'.repeat(86)+'\\','d');
+  put(3,38,'/'+' '.repeat(88)+'\\','d');
+  put(2,39,'/'+' '.repeat(90)+'\\','d');
+  put(1,40,'/'+' '.repeat(92)+'\\','d');
+  put(0,41,'|'+'_'.repeat(94)+'|','d');
+  for(y=42;y<=52;y++){put(0,y,'|','d');put(95,y,'|','d');}
+  put(0,53,'|'+'_'.repeat(94)+'|','d');
+  /* porte et fente */
+  put(36,44,'.-----------------------.','d');
+  for(y=45;y<=51;y++){put(36,y,'|','d');put(60,y,'|','d');}
+  put(36,52,"'-----------------------'",'d');
+  put(43,46,'.-------.','d');put(43,47,'|  [ ]  |','d');put(43,48,"'-------'",'d');
+  put(41,50,'1 KOIN  1 PLAY','d');
+}
+/* ---- touches et manette ---- */
+var KEYS=[['KORHOGAME','../index.html'],['FAUNEYE','../index.html'],['3615','../3615/'],['SURFAUNA','../index.html']];
+function panel(t){
+  var xs=[10,25,62,77];
+  KEYS.forEach(function(k,i){
+    var lit=state==='attract'?((Math.floor(t/180)%4)===i):true, c=lit?'h k':'d k';
+    put(xs[i],38,'.-----------.',c);put(xs[i],39,'|'+pad(k[0],11)+'|',c);put(xs[i],40,"'-----------'",c);
+  });
+  /* manette */
+  var jx=[47,46,48][Math.floor(t/900)%3];
+  put(jx,37,' _ ','r');put(jx,38,'(_)','r');put(47,39,'|','d');put(45,40,'.-=-.','d');
+}
+function pad(s,n){var l=Math.floor((n-s.length)/2);return ' '.repeat(l)+s+' '.repeat(n-s.length-l);}
+/* ---- néon : chaque lettre grésille ---- */
+function marquee(t){
+  var on=Math.random()>.04;
+  MARQ.forEach(function(l,j){
+    var s='';for(var i=0;i<l.length;i++){var c=l[i];if(c!==' '&&Math.random()<.012)c=' ';s+=c;}
+    put(20,2+j,s,on?'h':'d');
+  });
+  put(32,8,'.: MOTEL  KORHOGO  ::  ARCADE :.',on?'c':'d');
+}
+/* ---- écran : mode attraction ---- */
+var MASKS=['UNKLE MAUKIE','DOGXIM','C7H5N3O6','NAPHTA',"TS'UI PEN",'HONEY BUZZARD','HATRA LOVES','CROISIERE NOIRE','AUBE','SILENT PACT','MAIDEN CALL','PLAGUE OF JUSTINIAN','POISONED WELL','CADAVER SYNOD','TRUCE','AUVERGNE','GRAND COLONEL','MALIKA'];
+var state='attract',koins=3,scene=0,sceneT=0,drops=[];
+function screen(t){
+  var x0=14,y0=12,w=68,h=22;
+  if(state==='start'){
+    blink(t)&&put(x0+24,y0+9,'PRESS  START','h');
+    put(x0+20,y0+12,'KORONG!   FAUNA CHESS','');put(x0+20,y0+13,'ERRATIK   FAUNINVADERS','');
+    return;
+  }
+  var sc=Math.floor(t/7000)%3;
+  if(sc===0){ /* le roster des Masks */
+    put(x0+22,y0,'-= LES MASKS DE LA FAUNA =-','c');
+    MASKS.forEach(function(m,i){var col=i<9?0:1,row=i%9;var show=((t/90)|0)>(i*3);if(show)put(x0+6+col*34,y0+3+row*2,pad2(i+1)+'  '+m,i%5===0?'h':'');});
+  } else if(sc===1){ /* le motel, la nuit */
+    var room=[
+"          ____________________________________________",
+"         /|  _____        __________         ______  /|",
+"        / | |::::|  [=]  |  ~~~~~~  |  ()   |:  :| / |",
+"       /  | |::::|       |  ~~~~~~  |  /\\   |____|/  |",
+"      /   |__________________________________________|  /",
+"     /   /    .-----.        _______        ___     /  /",
+"    /   /    |  TV |       /______/|      ( @ )   /  /",
+"   /   /     '-----'       |______|/       |=|   /  /",
+"  /___/__________________________________________/  /",
+"  |__________________________________________________/"];
+    block(x0+6,y0+3,room,'');
+    var tv=Math.floor(t/120)%4;put(x0+20,y0+9,['.:.:','::..','.::.',':..:'][tv],'c');
+    put(x0+18,y0+1,'ROOM 06  -  MOTEL KORHOGO','d');
+  } else { /* tableau d'honneur */
+    put(x0+24,y0+1,'HALL  OF  KAVE','h');
+    var hs=[['LIO','00012'],['FFN','00011'],['MKT','00009'],['AUB','00007'],['T.S','00005']];
+    hs.forEach(function(r,i){put(x0+22,y0+4+i*2,(i+1)+'.  '+r[0]+'   ..........   '+r[1],i===0?'h':'');});
+  }
+  if(blink(t))put(x0+25,y0+h-1,'INSERT  KOIN','r');
+  put(x0+52,y0+h-1,'KOINS '+pad2(koins),'h');
+}
+function pad2(n){return (n<10?'0':'')+n;}
+function blink(t){return Math.floor(t/500)%2===0;}
+/* ---- pièces qui tombent dans la fente ---- */
+function coins(t){
+  drops=drops.filter(function(d){return d.y<47;});
+  drops.forEach(function(d){put(47,Math.floor(d.y),'$','h');d.y+=.6;});
+}
+/* ---- décodage : chaque cellule passe par des signes avant de se fixer ---- */
+var t0=performance.now(),SIGNS='!"#$%&()*+,-./:;<=>?@[\\]^_{|}~';
+function decode(t){
+  var p=(t-t0)/1100;if(p>=1.2)return;
+  for(var y=0;y<H;y++)for(var x=0;x<W;x++){var i=y*W+x,d=(x+y*1.6)/(W+H*1.6)*.6+((Math.sin(x*12.9898+y*78.233)*43758.5453)%1+1)%1*.4;
+    if(d>p){if(ch[i]!==' '||Math.random()<.04){ch[i]=d>p+.15?' ':SIGNS[(Math.random()*SIGNS.length)|0];}}}
+}
+/* ---- rendu : une seule <pre>, du vrai texte ---- */
+var links={};
+function draw(t){
+  clr();cabinet();marquee(t);screen(t);panel(t);coins(t);decode(t);
+  put(2,53,' [1] AMBRE  [2] VERT  [3] BLANC ','d');
+  var out='',cur=null,buf='';
+  for(var y=0;y<H;y++){
+    for(var x=0;x<W;x++){var i=y*W+x,c=cl[i];if(c!==cur){if(buf)out+=cur?'<span class="'+cur+'">'+esc(buf)+'</span>':esc(buf);buf='';cur=c;}buf+=ch[i];}
+    buf+='\n';
+  }
+  out+=cur?'<span class="'+cur+'">'+esc(buf)+'</span>':esc(buf);
+  E.innerHTML=out;
+}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;');}
+/* ---- taille : la borne tient toujours entière, mêmes proportions sur tout écran ---- */
+function fit(){var m=document.createElement('span');m.textContent='MMMMMMMMMM';m.style.cssText='position:absolute;visibility:hidden;font:100px VT,monospace;line-height:1';document.body.appendChild(m);var adv=m.getBoundingClientRect().width/1000;m.remove();var fs=Math.min(innerWidth*0.98/(W*adv),innerHeight*0.98/H);E.style.fontSize=Math.max(5,Math.floor(fs*10)/10)+'px';}
+addEventListener('resize',fit);fit();
+/* ---- gestes ---- */
+E.addEventListener('click',function(e){
+  var r=E.getBoundingClientRect(),cw=r.width/W,chh=r.height/H,x=Math.floor((e.clientX-r.left)/cw),y=Math.floor((e.clientY-r.top)/chh);
+  if(y>=44&&y<=52&&x>=36&&x<=60){koins++;drops.push({y:37});state='start';setTimeout(function(){state='attract';},6000);return;}
+  if(y>=38&&y<=40){var xs=[10,25,62,77];for(var k=0;k<4;k++)if(x>=xs[k]&&x<=xs[k]+12){location.href=KEYS[k][1];return;}}
+  if(y===53){if(x<12)document.body.className='';else if(x<21)document.body.className='vert';else if(x<31)document.body.className='blanc';}
+});
+addEventListener('keydown',function(e){if(e.key==='1')document.body.className='';if(e.key==='2')document.body.className='vert';if(e.key==='3')document.body.className='blanc';if(e.key===' '||e.key==='Enter'){koins++;drops.push({y:37});state='start';setTimeout(function(){state='attract';},6000);}});
+var last=0;function loop(t){requestAnimationFrame(loop);if(t-last<66)return;last=t;draw(t);}
+document.fonts.load('10px VT').then(function(){fit();t0=performance.now();requestAnimationFrame(loop);},function(){requestAnimationFrame(loop);});
+})();
+</script>
+</body>
+</html>
