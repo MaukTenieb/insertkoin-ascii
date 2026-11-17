@@ -80,3 +80,17 @@ for f in glob.glob(SRC + '/**/*', recursive=True):
     if rel.startswith(('pf/', 'archive/')) or not rel.lower().endswith(('.webp', '.png', '.jpg')): continue
     if R.search(rel): shutil.copy(f, os.path.join(O, rel))
 print("commandes d'époque restaurées")
+# accueil : la borne en texte ; l'arcade d'origine passe en arcade.html
+import shutil as _sh
+_o = open(f'{O}/index.html', encoding='utf-8').read()
+if 'id="s" aria-label="Insert Koin"' not in _o:
+    _sh.copy(f'{O}/index.html', f'{O}/arcade.html')
+_b = open(f'{O}/explorations/borne.html', encoding='utf-8').read()
+_b = _b.replace('url(../font-', 'url(font-').replace("'../3615/'", "'3615/'").replace("'../index.html'", "'arcade.html'")
+_b = _b.replace("location.href='motel.html'", "location.href='explorations/motel.html'").replace("location.href='masks.html'", "location.href='explorations/masks.html'")
+_b = _b.replace("state='start';setTimeout(function(){state='attract';},6000);return;}", "state='start';setTimeout(function(){location.href='arcade.html';},1400);return;}")
+_b = _b.replace("state='start';setTimeout(function(){state='attract';},6000);}});", "state='start';setTimeout(function(){location.href='arcade.html';},1400);}});")
+open(f'{O}/index.html', 'w', encoding='utf-8').write(_b)
+for _f in ('motel.html', 'masks.html'):
+    _p = f'{O}/explorations/{_f}'; _t = open(_p, encoding='utf-8').read().replace('href="borne.html"', 'href="../"'); open(_p, 'w', encoding='utf-8').write(_t)
+print('accueil texte en place')

@@ -2,7 +2,7 @@
 
 Insert Koin ASCII rebuilds Mauk Tenieb's Korhogo arcade, https://mauktenieb.github.io/insertkoin/, page for page, in characters.
 
-**Play: https://mauktenieb.github.io/insertkoin-ascii/** · in French: https://mauktenieb.github.io/insertkoin-ascii/fr.html
+**Play: https://mauktenieb.github.io/insertkoin-ascii/** — the cabinet drawn in characters; a Koin in the slot opens the arcade (`arcade.html`) · in French: https://mauktenieb.github.io/insertkoin-ascii/fr.html
 
 The pages, games, sounds and code stay those of Insert Koin. Every picture, sprite, video and live canvas turns into ASCII.
 
@@ -25,6 +25,10 @@ Insert Koin ASCII keeps its own settings, saves, Koins, caches and Nostr tags (`
 FotoFauna's colour tables and tool masks (`pf/luts`, `pf/moldiv/lut`, `pf/lotogram/film`, the `*Filter`, `*lookup*` and `*mask*` layers) stay as data: the filters read them as numbers.
 
 ## The clone's own touches
+
+- The home screen is the cabinet itself, drawn line by line in VT323: the INSERT KOIN neon flickers letter by letter and lights the characters around it, the screen runs its attract mode (the eighteen Masks, room 06, the Hall of Kave), the four keys chase each other and open their places, the slot takes a Koin and opens the arcade.
+- Room 06 (`explorations/motel.html`): a low-poly scene of the late nineties, turning by itself, drawn only in characters; volume edges become strokes of signs, surfaces a light weft.
+- The eighteen Masks in clear line (`explorations/masks.html`): contours in signs, six colours per Mask.
 
 - One grid for the whole page: every cell of every picture, background and game screen falls on the same weft, set on the page itself, as on a terminal of 1985 (`ascii-live.js`).
 - The decoding: each screen that opens (game, room, television, place) composes itself cell by cell, characters cascading in a diagonal wave from the top left corner before they settle on the picture.
