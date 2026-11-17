@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CHAMBRE 06 · exploration textmode 3D</title>
+<style>
+@font-face{font-family:"VT";src:url(../font-vt323-latin-400-normal.woff2) format("woff2");font-display:block}
+html,body{margin:0;height:100%;background:#0b0908;overflow:hidden}
+body{display:grid;place-items:center;touch-action:none;cursor:grab}
+body:active{cursor:grabbing}
+pre{font-family:"VT",monospace;margin:0;line-height:1;white-space:pre;user-select:none}
+pre::after{content:"";position:fixed;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.2) 0 1px,transparent 1px 3px)}
+#hud{position:fixed;left:0;right:0;bottom:0;font-family:"VT",monospace;color:#7a5300;text-align:center;padding:.6em;font-size:16px;letter-spacing:.08em;pointer-events:none}
+#back{position:fixed;left:14px;top:12px;font-family:"VT",monospace;font-size:22px;color:#ffb000;text-decoration:none}
+#back:focus-visible{outline:2px solid #4fc3f7;outline-offset:4px}
+</style>
+</head>
+<body>
+<a id="back" href="borne.html" aria-label="Retour à la borne">&lt;-</a>
+<pre id="s" aria-label="Chambre 06 du motel Korhogo, en caractères"></pre>
+<div id="hud">ROOM 06 · MOTEL KORHOGO</div>
+<script src="../three.min.js"></script>
+<script>
+(function(){
+'use strict';
+var E=document.getElementById('s');
+var COLS=120,ROWS=46,SW=4,SH=8;               /* chaque caractère lit 4 x 8 échantillons de l'image 3D */
+/* ---- atlas : la forme des 95 signes VT323, réduite à 4 x 8 ---- */
+var CH='';for(var c=32;c<127;c++)CH+=String.fromCharCode(c);
+var M=[],MM=[],RAMP=" ..:;=+*",EDGE=[];
+function buildAtlas(){
+  var cv=document.createElement('canvas');cv.width=10*CH.length;cv.height=20;var g=cv.getContext('2d');
+  g.fillStyle='#000';g.fillRect(0,0,cv.width,cv.height);g.fillStyle='#fff';g.font='25px VT';g.textBaseline='top';
+  for(var i=0;i<CH.length;i++)g.fillText(CH[i],i*10,-4);
+  var d=g.getImageData(0,0,cv.width,20).data;
+  for(i=0;i<CH.length;i++){var m=new Float32Array(SW*SH),s=0;
+    for(var y=0;y<SH;y++)for(var x=0;x<SW;x++){var a=0;for(var yy=0;yy<20/SH;yy++)for(var xx=0;xx<10/SW;xx++){var X=i*10+Math.floor(x*10/SW+xx),Y=Math.floor(y*20/SH+yy);a+=d[(Y*cv.width+X)*4]/255;}
+      m[y*SW+x]=a/((20/SH)*(10/SW));s+=m[y*SW+x]*m[y*SW+x];}
+    M.push(m);MM.push(s);}
+  for(i=1;i<CH.length;i++)if('/\\|_-()<>[]{}^v\'`,.:;=+*#"~'.indexOf(CH[i])>=0)EDGE.push(i);
+}
+/* ---- la chambre, en polygones bas, façon 1997 ---- */
+var R=new THREE.WebGLRenderer({antialias:false,preserveDrawingBuffer:true});
+var RT=new THREE.WebGLRenderTarget(COLS*SW,ROWS*SH,{minFilter:THREE.NearestFilter,magFilter:THREE.NearestFilter});
+var S=new THREE.Scene();S.background=new THREE.Color(0x020101);S.fog=new THREE.Fog(0x020101,14,30);
+var cam=new THREE.PerspectiveCamera(42,(COLS*0.5)/ROWS,0.1,60);
+function mat(c,e){return new THREE.MeshLambertMaterial({color:c,emissive:e||0,flatShading:true});}
+function box(w,h,d,c,x,y,z,e){var m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat(c,e));m.position.set(x,y,z);S.add(m);return m;}
+/* sol en damier */
+for(var i=-5;i<5;i++)for(var j=-4;j<4;j++)box(1,.1,1,((i+j)&1)?0x6a4a2a:0x3b2a18,i+.5,-.05,j+.5);
+box(10,3.4,.2,0x2e231b,0,1.7,-4.1);box(.2,3.4,8,0x261d16,-5.1,1.7,0);                       /* murs */
+var bed=box(3,.6,4.2,0x8a2a22,-2.6,.4,-1.6);box(3.2,1.4,.25,0x3a2416,-2.6,.9,-3.75);box(2.6,.25,1,0xd8cfb8,-2.6,.82,-3.1);   /* lit, tête de lit, oreiller */
+box(.9,.8,.9,0x3a2416,-.4,.4,-3.3);var lamp=box(.35,.5,.35,0xffd890,-.4,1.05,-3.3,0x553300);     /* table de nuit, lampe */
+box(2.4,1,1,0x3a2416,2.6,.5,-3.4);var tv=box(1.5,1.2,1.1,0x222222,2.6,1.6,-3.4);var scr=box(1.1,.85,.05,0x88ccff,2.6,1.6,-2.83,0x2a5a80);   /* commode, télé, écran */
+var win=box(2.2,1.2,.05,0x0a1020,0,2.3,-3.98,0x050a18);box(2.4,.12,.1,0x2a1a10,0,1.65,-3.95);
+var neon=box(1.4,.3,.05,0xff3b5b,0,2.55,-3.9,0x801020);                                        /* enseigne dehors, par la fenêtre */
+box(.15,3.2,1.5,0x2a1a10,-5,1.6,2.2);                                                         /* porte */
+box(1.6,.12,1.6,0xd8c8a0,1.6,.06,1.6);                                                        /* tapis */
+/* un Mask debout, en polygones bas */
+var fig=new THREE.Group();
+[[.55,.9,.35,0x2f5a3a,0,1.25,0],[.45,.45,.4,0xd9a066,0,1.95,0],[.5,.12,.5,0xe8d8a8,0,2.25,0],[.2,.8,.2,0x2a2a40,-.15,.4,0],[.2,.8,.2,0x2a2a40,.15,.4,0]].forEach(function(p){var m=new THREE.Mesh(new THREE.BoxGeometry(p[0],p[1],p[2]),mat(p[3]));m.position.set(p[4],p[5],p[6]);fig.add(m);});
+fig.position.set(1.2,0,0);S.add(fig);
+/* ventilateur au plafond */
+var fan=new THREE.Group();for(var k=0;k<4;k++){var bl=new THREE.Mesh(new THREE.BoxGeometry(1.6,.04,.25),mat(0x3a2a1a));bl.rotation.y=k*Math.PI/2;bl.position.set(Math.cos(k*Math.PI/2)*.8,0,-Math.sin(k*Math.PI/2)*.8);fan.add(bl);}
+/* lumières : la lampe, la télé, l'enseigne */
+S.add(new THREE.AmbientLight(0x4a3424,.7));var HL=new THREE.HemisphereLight(0xffd0a0,0x201008,.5);S.add(HL);
+var L1=new THREE.PointLight(0xffb060,1.4,8,1.6);L1.position.set(-.4,1.8,-3);S.add(L1);
+var L2=new THREE.PointLight(0x6ab8ff,1.2,7,1.6);L2.position.set(2.6,1.6,-2);S.add(L2);
+var L3=new THREE.PointLight(0xff3050,1.0,9,1.6);L3.position.set(0,3,-3.2);S.add(L3);
+/* ---- caméra : tourne seule, la main la reprend ---- */
+var ang=0.62,tilt=0.6,drag=null,auto=true;
+addEventListener('pointerdown',function(e){drag={x:e.clientX,y:e.clientY,a:ang,t:tilt};auto=false;});
+addEventListener('pointermove',function(e){if(!drag)return;ang=drag.a-(e.clientX-drag.x)*0.006;tilt=Math.max(.12,Math.min(.95,drag.t+(e.clientY-drag.y)*0.004));});
+addEventListener('pointerup',function(){drag=null;setTimeout(function(){auto=true;},4000);});
+/* ---- la passe texte : chaque cellule cherche le signe de même forme ---- */
+var buf=new Uint8Array(COLS*SW*ROWS*SH*4),nb=new Uint8Array(COLS*SW*ROWS*SH*4),v=new Float32Array(SW*SH),eg=new Float32Array(SW*SH);
+var RTN=new THREE.WebGLRenderTarget(COLS*SW,ROWS*SH,{minFilter:THREE.NearestFilter,magFilter:THREE.NearestFilter});
+var NM=new THREE.MeshNormalMaterial({flatShading:true});
+function toText(t0){
+  R.readRenderTargetPixels(RT,0,0,COLS*SW,ROWS*SH,buf);R.readRenderTargetPixels(RTN,0,0,COLS*SW,ROWS*SH,nb);
+  var W=COLS*SW,out='',cur='',run='';
+  for(var r=0;r<ROWS;r++){
+    for(var c=0;c<COLS;c++){
+      var sr=0,sg=0,sb=0,mx=0;
+      for(var y=0;y<SH;y++)for(var x=0;x<SW;x++){var Y=(ROWS*SH-1)-(r*SH+y),X=c*SW+x,i=(Y*W+X)*4;
+        var R0=buf[i]/255,G0=buf[i+1]/255,B0=buf[i+2]/255;sr+=R0;sg+=G0;sb+=B0;
+        var l=Math.pow(.2126*R0+.7152*G0+.0722*B0,.75);v[y*SW+x]=l;if(l>mx)mx=l;
+        var ix=X+1<W?i+4:i,iy=Y>0?i-W*4:i,dn=Math.abs(nb[i]-nb[ix])+Math.abs(nb[i+1]-nb[ix+1])+Math.abs(nb[i+2]-nb[ix+2])+Math.abs(nb[i]-nb[iy])+Math.abs(nb[i+1]-nb[iy+1])+Math.abs(nb[i+2]-nb[iy+2]);
+        eg[y*SW+x]=dn>60?1:0;}
+      var ch=' ',col='',n=SW*SH,mean=0,mn=9;for(var k=0;k<n;k++){mean+=v[k];if(v[k]<mn)mn=v[k];}mean/=n;
+      var es=0;for(k=0;k<n;k++)es+=eg[k];
+      if(es>=2){ /* arête de volume : ligne claire en signes */
+        var best=1e9,bg=0;
+        for(var gi=0;gi<EDGE.length;gi++){var g=EDGE[gi],m=M[g],e=0;for(k=0;k<n;k++){var dd=eg[k]-m[k];e+=dd*dd;}if(e<best){best=e;bg=g;}}
+        ch=CH[bg];
+      } else if(mx>.05){ /* aplat : trame légère selon la lumière */
+        ch=RAMP[Math.min(RAMP.length-1,Math.floor(Math.pow(mean,1.1)*RAMP.length*1.25))];
+      }
+      if(ch!==' '){var mm=Math.max(sr,sg,sb)/n||1e-3,k2=es>=2?1:Math.min(.85,.25+.8*Math.sqrt(mean));
+        var q=function(z){return Math.min(255,Math.round(z/mm*255*k2/24)*24);};col='rgb('+q(sr/n)+','+q(sg/n)+','+q(sb/n)+')';}
+      if(col!==cur){if(run)out+=cur?'<span style="color:'+cur+'">'+esc(run)+'</span>':esc(run);run='';cur=col;}
+      run+=ch;
+    }
+    run+='\n';
+  }
+  out+=cur?'<span style="color:'+cur+'">'+esc(run)+'</span>':esc(run);
+  E.innerHTML=out;
+}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;');}
+/* ---- taille : la chambre tient l'écran, mêmes proportions partout ---- */
+function fit(){var m=document.createElement('span');m.textContent='MMMMMMMMMM';m.style.cssText='position:absolute;visibility:hidden;font:100px VT;line-height:1';document.body.appendChild(m);var adv=m.getBoundingClientRect().width/1000;m.remove();
+  var fs=Math.min(innerWidth*0.98/(COLS*adv),innerHeight*0.9/ROWS);E.style.fontSize=Math.max(4,Math.floor(fs*10)/10)+'px';cam.aspect=(COLS*adv)/ROWS;cam.updateProjectionMatrix();}
+addEventListener('resize',fit);
+/* ---- boucle : 15 images/s, polygones qui tremblent comme sur la console ---- */
+var last=0,t0=performance.now();
+function loop(t){
+  requestAnimationFrame(loop);if(t-last<66)return;last=t;
+  if(auto)ang+=0.0035;
+  var d=10.5;cam.position.set(Math.sin(ang)*d*Math.cos(tilt),d*Math.sin(tilt)+1.2,Math.cos(ang)*d*Math.cos(tilt));
+  cam.position.x=Math.round(cam.position.x*16)/16;cam.position.y=Math.round(cam.position.y*16)/16;cam.position.z=Math.round(cam.position.z*16)/16;   /* tremblé PS1 */
+  cam.lookAt(0,.7,-.3);
+  fan.rotation.y=t/700;fig.rotation.y=Math.sin(t/2600)*1.2;
+  var f=.65+.35*Math.random();L2.intensity=1.2*f;scr.material.emissive.setRGB(.10*f,.25*f,.40*f);   /* la télé grésille */
+  var on=Math.floor(t/700)%5!==0;L3.intensity=on?1.0:0.15;neon.material.emissive.setHex(on?0x801020:0x100205);
+  R.setRenderTarget(RT);R.render(S,cam);S.overrideMaterial=NM;R.setRenderTarget(RTN);R.render(S,cam);S.overrideMaterial=null;R.setRenderTarget(null);
+  toText(t0);
+}
+document.fonts.load('25px VT').then(function(){buildAtlas();fit();requestAnimationFrame(loop);});
+})();
+</script>
+</body>
+</html>
