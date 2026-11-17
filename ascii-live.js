@@ -129,7 +129,7 @@
       if (!o.t.trim()) return;
       var m = /(\d+(?:\.\d+)?)px/.exec(o.font), h = (m ? parseFloat(m[1]) : 12) * o.sy * ky;
       var size = Math.max(6, Math.min(h, o.w > 0 ? o.w * k / o.t.length : h));
-      size = Math.max(6, Math.round(size));
+      size = Math.max(Math.round(8 * tx.width / Math.max(1, it.ov.getBoundingClientRect().width)), Math.round(size));
       g.font = size + 'px "IK Arcade", monospace'; g.textAlign = o.align || 'start'; g.textBaseline = o.base || 'alphabetic';
       var x = o.x * k, y = o.y * ky, w = g.measureText(o.t).width, x0 = x;
       if (g.textAlign === 'center') x0 = x - w / 2; else if (g.textAlign === 'right' || g.textAlign === 'end') x0 = x - w;
@@ -173,7 +173,10 @@
     var list = document.getElementsByTagName('canvas');
     for (var i = 0; i < list.length; i++) {
       var c = list[i];
-      if (!window.ASCII_NO_CANVAS && !c.__ascii && !c.dataset.asciiOverlay && !c.dataset.asciiSkip && visible(c)) attach(c);
+      if (!window.ASCII_NO_CANVAS && !c.__ascii && !c.dataset.asciiOverlay && !c.dataset.asciiSkip && visible(c)) {
+        if (Math.min(c.offsetWidth, c.offsetHeight) < 64 || c.closest('button,[role=button],label')) { c.dataset.asciiSkip = '1'; continue; }   // figurines et pictos des commandes : image d'époque
+        attach(c);
+      }
     }
   }
   function place(it) {
@@ -266,7 +269,8 @@
      à sa taille d'affichage réelle, depuis l'original (_o/), avec une cellule de corps constant. ---- */
   var ROOT = (function () { var s = document.currentScript && document.currentScript.src; return s ? s.slice(0, s.lastIndexOf('/') + 1) : location.href.replace(/[^\/]*$/, ''); })();
   var CELL_CSS = 7, baker = null, queue = Promise.resolve(), done = new WeakMap(), srcCache = new Map();
-  function cellDev() { var d = window.devicePixelRatio || 1; return 8 * Math.max(1, Math.round(CELL_CSS * d / 8)); }   // un seul corps, sur pixels entiers
+  function cellCss() { return Math.max(5.33, Math.min(8, Math.min(innerWidth, innerHeight * 1.6) / 180)); }
+  function cellDev() { var d = window.devicePixelRatio || 1; return 8 * Math.max(1, Math.round(cellCss() * d / 8)); }   // un seul corps, sur pixels entiers
   var CONTROL = /(^|\/)(bouton-|baku-boom|camera-|manette-|molette|koin(-hd)?[-.]|de-[a-c]\.|btn|knob|screw|sw-|favicon|icon\.|plaque-|butee-|porte-cle|mikro)/;
   function isControl(u) { return CONTROL.test((u || '').split(/[?#]/)[0]); }
   function origUrl(u) {

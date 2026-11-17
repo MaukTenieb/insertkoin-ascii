@@ -14,6 +14,10 @@
     a.style.setProperty('background-color', '#16120f', 'important');
     a.onmouseenter = function () { a.style.transform = 'scale(1.08)'; }; a.onmouseleave = function () { a.style.transform = ''; };
     document.body.appendChild(a);
+    var scroll = document.documentElement.scrollHeight > innerHeight * 1.15;
+    if (scroll) { document.body.style.paddingBottom = 'max(' + (getComputedStyle(document.body).paddingBottom) + ', 76px)'; }   // page qui défile : une marge en bas garde le texte hors de la dynamite
+    else { a.style.bottom = ''; a.style.top = 'max(8px,env(safe-area-inset-top))'; a.style.width = a.style.height = '32px'; a.style.backgroundSize = '22px'; a.style.opacity = '.78';
+      a.onmouseenter = function () { a.style.transform = 'scale(1.25)'; a.style.opacity = '1'; }; a.onmouseleave = function () { a.style.transform = ''; a.style.opacity = '.78'; }; }
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 })();

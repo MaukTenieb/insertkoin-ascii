@@ -17,6 +17,8 @@ Chaque demande et chaque constat des juges externes entre ici. Un écart sort de
 | 3 | 5,5/10 | 5,7/10 | 6/10 |
 | 4 | 6/10 | 5,6/10 | 6/10 |
 
+Jury d'agences, passage 5 : direction artistique 6,5/10, UX 6,2/10 (Nielsen 20/32), mobile 5,5/10 ; rapports agence-DA.md, agence-UX.md, agence-MOBILE.md.
+
 ## Écarts traités au passage 1
 
 - Corps de caractère variable d'un objet à l'autre : grille unique calculée à l'exécution (`ascii-live.js`, originaux dans `_o/`).
@@ -35,7 +37,7 @@ Chaque demande et chaque constat des juges externes entre ici. Un écart sort de
 
 ## Règles établies aux passages 3 et 4
 
-- Un seul corps de caractère : 8 px CSS, sur pixels entiers, pour les images, fonds, pseudo-éléments et canvas. La cellule de 3 px est abandonnée : elle donnait une trame photo.
+- Un seul corps de caractère par écran, sur pixels entiers : 8 px CSS au bureau, 5,33 px CSS au téléphone (16 pixels physiques à 3 dppx). D'abord 8 px partout, sur pixels entiers, pour les images, fonds, pseudo-éléments et canvas. La cellule de 3 px est abandonnée : elle donnait une trame photo.
 - Sous 8 × 8 cellules (environ 64 px), et dans toute commande (bouton, étiquette, champ), l'objet garde son image d'époque : clarté absolue des commandes, zéro mosaïque.
 - Canvas : les lettres restent permises là où le jeu écrit (pénalité 0,10 au lieu de 0,15).
 - Écran Videotex du 3615 : laissé en lettres.
