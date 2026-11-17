@@ -183,7 +183,7 @@ addEventListener('resize',fit);fit();
 E.addEventListener('click',function(e){
   var r=E.getBoundingClientRect(),cw=r.width/W,chh=r.height/H,x=Math.floor((e.clientX-r.left)/cw),y=Math.floor((e.clientY-r.top)/chh);
   if(y>=44&&y<=52&&x>=36&&x<=60){koins++;drops.push({y:37});state='start';setTimeout(function(){state='attract';},6000);return;}
-  if(y>=12&&y<=33&&x>=14&&x<=81&&Math.floor(performance.now()/7000)%3===1){location.href='motel.html';return;}
+  if(y>=12&&y<=33&&x>=14&&x<=81){var sc=Math.floor(performance.now()/7000)%3;if(sc===1){location.href='motel.html';return;}if(sc===0){location.href='masks.html';return;}}
   if(y>=38&&y<=40){var xs=[10,25,62,77];for(var k=0;k<4;k++)if(x>=xs[k]&&x<=xs[k]+12){location.href=KEYS[k][1];return;}}
   if(y===53){if(x<12)document.body.className='';else if(x<21)document.body.className='vert';else if(x<31)document.body.className='blanc';}
 });
