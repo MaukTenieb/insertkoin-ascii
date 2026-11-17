@@ -445,7 +445,7 @@ body:not(.on-home) .info,body:not(.on-home) .foot{display:none}
 .sig{text-shadow:none!important}
 .gtip{box-shadow:none!important}
 </style>
-<script src="ascii-live.js" defer></script><link rel="stylesheet" href="ascii-commun.css"><script src="ascii-prompteur.js" defer></script></head>
+<script src="ascii-live.js" defer></script><link rel="stylesheet" href="ascii-commun.css"><script src="ascii-lisible.js" defer></script><script src="ascii-loupe.js" defer></script><script src="ascii-prompteur.js" defer></script></head>
 <body>
 
 
@@ -1769,7 +1769,7 @@ function go(k){if(window.__borneGo&&window.__borneGo(k))return;ac();
   if(k==='room'){buildLobby();show('select');return;}
   if(k==='terminal'){try{localStorage.setItem('vdx.lang',LANG);}catch(e){}calqueSrc('3615/').then(function(s){openCalque(s+'?svc=korhogo','3615');},function(){openCalque('3615-local.html','3615');});return;}
   if(k==='kal'){try{localStorage.setItem('vdx.lang',LANG);}catch(e){}calqueSrc('3615/').then(function(s){openCalque(s+(s.indexOf('?')<0?'?svc=koins':'&svc=koins'),'3615 KOINS');},function(){openCalque('3615-local.html?svc=koins','3615 KOINS');});return;}
-  if(k==='visit'){calqueSrc('/katabase/').then(function(s){openCalque(s,'BURROWS');kataLang();});return;}
+  if(k==='visit'){calqueSrc('katabase/').then(function(s){openCalque(s,'BURROWS');kataLang();});return;}
   if(k==='photo'){photoLang();return openCalque('fotofauna.html','KamOrhogo');}
   if(k==='repo')return openCalque('reporhogo.html','Reporhogo');
   if(k==='skopo')return openCalque('skoporhogo.html','SkopoRhogo');

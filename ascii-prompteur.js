@@ -36,6 +36,6 @@
     var all = document.body ? document.body.getElementsByTagName('*') : [];
     for (var i = 0; i < all.length; i++) { var el = all[i]; try { if (candidate(el)) wrap(el); } catch (e) {} }
   }
-  function start() { scan(); setInterval(scan, 1500); }
+  function start() { scan(); (function(){var t=0;function go(){clearTimeout(t);t=setTimeout(scan,350);}try{new MutationObserver(go).observe(document.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:['class','src']});}catch(e){}setInterval(scan,5000);})(); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 })();

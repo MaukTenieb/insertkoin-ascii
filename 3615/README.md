@@ -1,6 +1,6 @@
 # 3615 KORHOGO (K Terminal)
 
-Le MiniTale de [Korhogo Fauna](https://mauktenieb.github.io/katabase), l'univers de Mauk Tenieb.
+Le MiniTale de [Korhogo Fauna](https://mauktenieb.github.io/insertkoin-ascii/katabase), l'univers de Mauk Tenieb.
 
 En ligne : https://mauktenieb.github.io/insertkoin-ascii/3615/
 
@@ -60,7 +60,7 @@ Projet indépendant d'Orange. Minitel est une marque d'Orange.
 
 ## English
 
-The MiniTale of [Korhogo Fauna](https://mauktenieb.github.io/katabase), the universe of Mauk Tenieb. Online: https://mauktenieb.github.io/insertkoin-ascii/3615/
+The MiniTale of [Korhogo Fauna](https://mauktenieb.github.io/insertkoin-ascii/katabase), the universe of Mauk Tenieb. Online: https://mauktenieb.github.io/insertkoin-ascii/3615/
 
 The K Terminal dials 3615 and opens the 3615 KORHOGO home page. The home menu has six entries. Below the menu, the Hall of Kave shows the top five of Korong! and of FaunInvaders.
 
@@ -113,7 +113,7 @@ Independent project, separate from Orange. Minitel is a trademark of Orange.
 <!-- network:start -->
 ## Work
 
-- [Katabase](https://mauktenieb.github.io/katabase/): the Burrows, with the albums and clips of the Korhogo Fauna.
+- [Katabase](https://mauktenieb.github.io/insertkoin-ascii/katabase/): the Burrows, with the albums and clips of the Korhogo Fauna.
 - [Insert Koin](https://mauktenieb.github.io/insertkoin-ascii/): an arcade cabinet in the browser and the Kaves of the motel (KorhogOS, the TV, the Video Kave, the DVD player).
   - Korong!: air-puck against the eighteen Masks; each Mask plays by its stats and a signature move.
   - Fauna Chess: fairy chess against the Fauna.

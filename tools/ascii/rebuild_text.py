@@ -17,6 +17,15 @@ for root, dirs, files in os.walk(S3615):
         p = os.path.join(root, fn); rel = os.path.relpath(p, S3615)
         if is_text(rel):
             os.makedirs(os.path.dirname(os.path.join(O, '3615', rel)), exist_ok=True); shutil.copy(p, os.path.join(O, '3615', rel))
+SKB = '/home/claude/src/katabase'
+for root, dirs, files in os.walk(SKB):
+    dirs[:] = [d for d in dirs if d not in ('.git', '.github')]
+    for fn in files:
+        p = os.path.join(root, fn); rel = os.path.relpath(p, SKB)
+        if is_text(rel) or rel.endswith(('.woff2', '.webp', '.png', '.jpg')):
+            dst = os.path.join(O, 'katabase', rel)
+            if rel.endswith(('.webp', '.png', '.jpg')) and os.path.exists(dst): continue   # image déjà convertie
+            os.makedirs(os.path.dirname(dst), exist_ok=True); shutil.copy(p, dst)
 # 2. isolation
 s = open(f'{O}/sw.js').read()
 s = s.replace("const C='borne-", "const C='ascii-").replace("(k.indexOf('borne-')===0||(k.indexOf('ik-')===0&&k.indexOf('ik-archive')!==0))", "k.indexOf('ascii-')===0")
@@ -28,10 +37,10 @@ for f in glob.glob(f'{O}/.github/workflows/*'):
     if os.path.basename(f) not in ('palmares.yml', 'tor-consensus.yml'): os.remove(f)
 for d_ in ('probe', 'voir'): shutil.rmtree(f'{O}/.github/{d_}', ignore_errors=True)
 for f in ('index.html', 'fr.html', 'insertkoin.html'):
-    p = f'{O}/{f}'; s = open(p).read().replace("calqueSrc('/3615/')", "calqueSrc('3615/')"); open(p, 'w').write(s)
-for f in glob.glob(f'{O}/3615/**/*', recursive=True):
+    p = f'{O}/{f}'; s = open(p).read().replace("calqueSrc('/3615/')", "calqueSrc('3615/')").replace("calqueSrc('/katabase/')", "calqueSrc('katabase/')"); open(p, 'w').write(s)
+for f in glob.glob(f'{O}/3615/**/*', recursive=True) + glob.glob(f'{O}/katabase/**/*', recursive=True):
     if os.path.isfile(f) and is_text(f):
-        s = open(f, encoding='utf-8').read(); n = re.sub(r'mauktenieb\.github\.io/3615(?![-\w])', 'mauktenieb.github.io/insertkoin-ascii/3615', s)
+        s = open(f, encoding='utf-8').read(); n = re.sub(r'mauktenieb\.github\.io/(3615|katabase)(?![-\w])', r'mauktenieb.github.io/insertkoin-ascii/\1', s)
         if n != s: open(f, 'w', encoding='utf-8').write(n)
 # 3. fichiers du clone
 for f in ('ascii-live.js', 'ascii-isole.js'): shutil.copy(f'{T}/{f}', f'{O}/{f}')
@@ -46,6 +55,9 @@ for p in glob.glob(f'{O}/**/*.html', recursive=True):
     s = open(p, encoding='utf-8', errors='surrogateescape').read(); o = s; up = '../' * rel.count('/')
     if 'ascii-commun.css' not in s:
         s = re.sub(r'</head>', f'<link rel="stylesheet" href="{up}ascii-commun.css"></head>', s, count=1, flags=re.I)
+    for js in ('ascii-lisible.js', 'ascii-loupe.js'):
+        if js not in s:
+            s = re.sub(r'</head>', f'<script src="{up}{js}" defer></script></head>', s, count=1, flags=re.I)
     if 'ascii-prompteur.js' not in s:
         s = re.sub(r'</head>', f'<script src="{up}ascii-prompteur.js" defer></script></head>', s, count=1, flags=re.I)
     if rel in ANNEXE and 'ascii-annexe.css' not in s:

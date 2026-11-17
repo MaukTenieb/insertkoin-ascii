@@ -93,7 +93,7 @@ button,[role=button]{touch-action:manipulation;user-select:none;-webkit-user-sel
 @keyframes gr{0%{background-position:0 0}20%{background-position:-37px 61px}40%{background-position:83px -17px}60%{background-position:-91px -53px}80%{background-position:29px 97px}}
 @media (prefers-reduced-motion:reduce){#grain{animation:none}.scene,.scene.on,#hall{transition-duration:.01s}.box{transition:none}}
 </style>
-<script src="../ascii-live.js" defer></script><link rel="stylesheet" href="../ascii-commun.css"><script src="../ascii-prompteur.js" defer></script></head>
+<script src="../ascii-live.js" defer></script><link rel="stylesheet" href="../ascii-commun.css"><script src="../ascii-lisible.js" defer></script><script src="../ascii-loupe.js" defer></script><script src="../ascii-prompteur.js" defer></script></head>
 <body>
 <div id="ikwait" style="position:fixed;inset:0;z-index:2147482000;background:#050403 center/cover no-repeat;transition:opacity .6s"></div>
 <script>/* 8 nov. 2026 (Mauk Tenieb) : pendant le chargement, une image de la banque d'attente de la borne, tirée au hasard ; 10 nov. : seulement les images carrées ou presque (02, 25, 26, 27 sortent : bandes floues), et le voile laisse passer le doigt dès qu'il s'efface */(function(){var w=document.getElementById('ikwait'),A=[1,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],i=A[Math.floor(Math.random()*A.length)];w.style.backgroundImage='url(../attente-'+(i<10?'0':'')+i+'.webp)';var done=0;function off(){if(done)return;done=1;w.style.opacity='0';w.style.pointerEvents='none';setTimeout(function(){w.remove()},700)}addEventListener('load',off);setTimeout(off,8000)})();</script>

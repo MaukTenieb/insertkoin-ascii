@@ -332,7 +332,7 @@
     done.set(el, { key: key });
     job(function () { return loadImg(o).then(function (im) { return bake(im, p.w, p.h, p.cell); }).then(function (u) {
       if (!u) return; var old = done.get(el); if (old && old.url) URL.revokeObjectURL(old.url);
-      el.srcset = u + ' ' + p.d.toFixed(5) + 'x'; done.set(el, { key: key, url: u });
+      el.srcset = u + ' ' + p.d.toFixed(5) + 'x'; el.dataset.asciiO = o; done.set(el, { key: key, url: u });
     }); });
   }
   function layerScale(cs, i, r, nw, nh) {
@@ -371,7 +371,7 @@
         }, function () { return L.trim(); });
       })).then(function (out) {
         var v = out.join(', ');
-        if (v !== bg) { el.style.backgroundImage = v; done.set(el, { key: key, size: Math.round(r.width) + 'x' + Math.round(r.height), orig: bg }); }
+        if (v !== bg) { el.style.backgroundImage = v; var m0 = bg.match(/url\("?([^")]+)"?\)/); if (m0 && origUrl(m0[1])) el.dataset.asciiO = origUrl(m0[1]); done.set(el, { key: key, size: Math.round(r.width) + 'x' + Math.round(r.height), orig: bg }); }
       });
     });
   }
@@ -418,6 +418,6 @@
   }
   function start() {
     scan(); setInterval(scan, 800); requestAnimationFrame(loop);
-    try { if (window.WebGL2RenderingContext) { scanStill(); setInterval(scanStill, 1200); addEventListener('resize', function () { setTimeout(scanStill, 300); }); } } catch (e) {}
+    try { if (window.WebGL2RenderingContext) { scanStill(); (function(){var t=0;function go(){clearTimeout(t);t=setTimeout(scanStill,350);}try{new MutationObserver(go).observe(document.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:['class','src']});}catch(e){}setInterval(scanStill,5000);})(); addEventListener('resize', function () { setTimeout(scanStill, 300); }); } } catch (e) {}
   }
 })();

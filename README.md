@@ -28,6 +28,11 @@ FotoFauna's colour tables and tool masks (`pf/luts`, `pf/moldiv/lut`, `pf/lotogr
 
 - Every text longer than its box scrolls in place, back and forth, as a teleprompter (`ascii-prompteur.js`).
 - The text pages (bio, notes, Kuration, the Kave index) stand in the cabinet's dark room, in DM Mono and Press Start 2P (`ascii-annexe.css`).
+- The loupe: hold Alt, or rest a finger half a second, and a circle follows the hand and shows the original picture under the characters, games included (`ascii-loupe.js`).
+- On a touch screen, interface texts rise to 11 px wherever the layout keeps its shape, and every control answers on 44 px (`ascii-lisible.js`).
+- The games' own words, scores and titles, come back sharp in the grid, in Press Start 2P (`ascii-live.js`).
+- Controls (buttons, joystick, knobs, dice, Koins, plates) keep their period picture on every device; every other picture turns into characters.
+- BURROWS opens Korhogo Fauna inside the clone (`katabase/`), in characters too.
 - A lost address lights TILT, and the red button brings the visitor back to the cabinet (`404.html`).
 
 ## Licence
