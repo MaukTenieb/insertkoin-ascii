@@ -1,7 +1,7 @@
 {
- "updated": "2026-11-17T07:55Z",
+ "updated": "2026-11-20T23:59Z",
  "relays": {
-  "wss://relay.damus.io": 0,
+  "wss://relay.damus.io": 1,
   "wss://nos.lol": 1,
   "wss://relay.primal.net": 1,
   "wss://nostr.mom": 1
@@ -9,7 +9,7 @@
  "korong": [],
  "fauninvaders": [],
  "first": {
-  "ba8e33d5441c3d8ad878be16625f31126e1604fb9de2afd3edcc7df76d508f76": 1794885001
+  "ba8e33d5441c3d8ad878be16625f31126e1604fb9de2afd3edcc7df76d508f76": 1794882617
  },
  "kave": []
 }
